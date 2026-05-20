@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "436134775966",
+    "project_id": "unispaces-2ea9a",
+    "storage_bucket": "unispaces-2ea9a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436134775966:android:0c68f2312252de316d3f8f",
+        "android_client_info": {
+          "package_name": "com.example.unispaces"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqkyD9QBU6KwgcSxQNPkrta8OifGTEHgg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
