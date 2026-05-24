@@ -7,7 +7,6 @@ import '../reserva_form_page.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  // Função de Logout
   void _sair(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     if (!context.mounted) return;
@@ -18,7 +17,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Função para excluir a reserva com confirmação de segurança
   void _excluirReserva(BuildContext context, String reservaId) {
     showDialog(
       context: context,
@@ -32,7 +30,7 @@ class HomePage extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // Fecha o aviso
+              Navigator.pop(context);
               
               final user = FirebaseAuth.instance.currentUser;
               if (user != null) {
@@ -77,6 +75,7 @@ class HomePage extends StatelessWidget {
         title: const Text('UniSpaces - Painel'),
         backgroundColor: const Color(0xFF0D6EFD),
         foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
@@ -92,12 +91,12 @@ class HomePage extends StatelessWidget {
           children: [
             Text(
               'Logado como: ${user?.email ?? "Email não encontrado"}',
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             const Text(
               'Suas Reservas:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -117,12 +116,20 @@ class HomePage extends StatelessWidget {
                     return const Center(child: Text('Erro ao carregar reservas.'));
                   }
                   
+                  // NOVO VISUAL: Empty State Moderno
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'Nenhuma reserva encontrada.\nToque no botão "+" para criar.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.event_busy, size: 80, color: Colors.grey.shade300),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Nenhuma reserva encontrada.\nToque no botão "+" abaixo para criar.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                          ),
+                        ],
                       ),
                     );
                   }
@@ -142,46 +149,56 @@ class HomePage extends StatelessWidget {
 
                       final corStatus = status == 'Confirmada' ? Colors.green : Colors.orange;
 
+                      // NOVO VISUAL: Cartões flutuantes com bordas arredondadas
                       return Card(
-                        elevation: 2,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: corStatus.withValues(alpha: 0.2),
-                            child: Icon(Icons.meeting_room, color: corStatus),
-                          ),
-                          title: Text(
-                            sala,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text('$dataReserva • $horario\nStatus: $status'),
-                          isThreeLine: true,
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // NOVA AÇÃO DE EDITAR
-                              IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ReservaFormPage(
-                                        reservaId: reserva.id,
-                                        dadosAtuais: data,
+                        elevation: 3,
+                        shadowColor: Colors.black26,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              radius: 24,
+                              backgroundColor: corStatus.withValues(alpha: 0.15),
+                              child: Icon(Icons.meeting_room, color: corStatus),
+                            ),
+                            title: Text(
+                              sala,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text('$dataReserva • $horario\nStatus: $status'),
+                            ),
+                            isThreeLine: true,
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit_outlined, color: Colors.blue),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ReservaFormPage(
+                                          reservaId: reserva.id,
+                                          dadosAtuais: data,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              // AÇÃO DE DELETAR
-                              IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  _excluirReserva(context, reserva.id);
-                                },
-                              ),
-                            ],
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                  onPressed: () {
+                                    _excluirReserva(context, reserva.id);
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -202,7 +219,8 @@ class HomePage extends StatelessWidget {
         },
         backgroundColor: const Color(0xFF0D6EFD),
         foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
+        elevation: 4,
+        child: const Icon(Icons.add, size: 28),
       ),
     );
   }

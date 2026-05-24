@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ReservaFormPage extends StatefulWidget {
-  // Variáveis para receber os dados quando for modo de edição
   final String? reservaId;
   final Map<String, dynamic>? dadosAtuais;
 
@@ -24,7 +23,6 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
   @override
   void initState() {
     super.initState();
-    // Se recebemos dados (modo edição), preenchemos os campos automaticamente
     if (widget.dadosAtuais != null) {
       _salaController.text = widget.dadosAtuais!['sala'] ?? '';
       _dataController.text = widget.dadosAtuais!['data'] ?? '';
@@ -46,7 +44,6 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
             .doc(user.uid)
             .collection('reservas');
 
-        // Prepara o pacote de dados (não atualizamos o status nem a data de criação na edição)
         final Map<String, dynamic> dadosParaSalvar = {
           'sala': _salaController.text,
           'data': _dataController.text,
@@ -55,12 +52,10 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
         };
 
         if (widget.reservaId == null) {
-          // MODO CADASTRO: Adiciona as chaves exclusivas de criação
           dadosParaSalvar['status'] = 'Confirmada';
           dadosParaSalvar['criadoEm'] = FieldValue.serverTimestamp();
           await reservasRef.add(dadosParaSalvar);
         } else {
-          // MODO EDIÇÃO: Atualiza apenas os dados no documento existente
           await reservasRef.doc(widget.reservaId).update(dadosParaSalvar);
         }
 
@@ -71,6 +66,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
                   ? 'Reserva salva com sucesso!' 
                   : 'Reserva atualizada com sucesso!'),
               backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
             ),
           );
           Navigator.pop(context);
@@ -81,6 +77,7 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
             SnackBar(
               content: Text('Erro ao salvar: $e'),
               backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -90,7 +87,6 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Muda o título dinamicamente com base na ação
     final tituloTela = widget.reservaId == null ? 'Nova Reserva' : 'Editar Reserva';
 
     return Scaffold(
@@ -98,43 +94,57 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
         title: Text(tituloTela),
         backgroundColor: const Color(0xFF0D6EFD),
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
+              // NOVO VISUAL: Campos com ícones indicativos
               TextFormField(
                 controller: _salaController,
-                decoration: const InputDecoration(labelText: 'Sala/Laboratório'),
+                decoration: const InputDecoration(
+                  labelText: 'Sala/Laboratório',
+                  prefixIcon: Icon(Icons.business),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Informe a sala da reserva';
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _dataController,
-                decoration: const InputDecoration(labelText: 'Data (ex: 28/05/2026)'),
+                decoration: const InputDecoration(
+                  labelText: 'Data (ex: 28/05/2026)',
+                  prefixIcon: Icon(Icons.calendar_today),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Informe a data';
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _horarioController,
-                decoration: const InputDecoration(labelText: 'Horário (ex: 08:00 - 10:00)'),
+                decoration: const InputDecoration(
+                  labelText: 'Horário (ex: 08:00 - 10:00)',
+                  prefixIcon: Icon(Icons.access_time),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Informe o horário';
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _finalidadeController,
-                decoration: const InputDecoration(labelText: 'Finalidade (ex: Aula prática)'),
+                decoration: const InputDecoration(
+                  labelText: 'Finalidade (ex: Aula prática)',
+                  prefixIcon: Icon(Icons.assignment_outlined),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Informe o propósito da reserva';
@@ -144,15 +154,22 @@ class _ReservaFormPageState extends State<ReservaFormPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: _salvarReserva,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0D6EFD),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
                 ),
-                child: Text(widget.reservaId == null ? 'Salvar Reserva' : 'Atualizar Reserva'),
+                child: Text(
+                  widget.reservaId == null ? 'Salvar Reserva' : 'Atualizar Reserva',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
